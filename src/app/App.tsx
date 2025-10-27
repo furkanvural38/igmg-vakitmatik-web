@@ -1,33 +1,42 @@
+// src/app/App.tsx
 import { AppShell } from "./AppShell";
+import { useCity } from "./CityProvider";
 
 export default function App() {
+    const { config, isValidCity, cityKey } = useCity();
+
     return (
         <AppShell>
-            <div className="flex flex-col w-full h-full">
-                {/* HEADER-BEREICH */}
-                <header className="w-full">
-                    {/* Hier kommt später dein Header mit Logo + Moschee-Name */}
-                    <div className="text-white text-5xl font-bold p-8">
-                        Header (kommt später rein)
-                    </div>
-                </header>
+            {!isValidCity ? (
+                // Ungültige Stadt in URL
+                <div className="w-full h-full flex items-center justify-center bg-black text-red-500 text-6xl font-bold">
+                    Unbekannte Stadt: {cityKey}
+                </div>
+            ) : (
+                <div className="flex flex-col w-full h-full text-white">
+                    {/* HEADER */}
+                    <header className="w-full border-b border-neutral-700 p-8 flex items-center justify-between">
+                        <div className="text-5xl font-bold leading-snug">
+                            {config?.mosqueName}
+                        </div>
+                        <div className="text-2xl text-neutral-400 text-right">
+                            Wetter-Ort: {config?.weatherCityName}
+                            <br />
+                            API: {config?.prayerApiUrl}
+                        </div>
+                    </header>
 
-                {/* MITTLERER BEREICH */}
-                <main className="flex-1 flex flex-row">
-                    {/* Linke / zentrale große Gebetszeit- und Countdown-Fläche */}
-                    <section className="flex-1 flex items-center justify-center text-white text-8xl">
-                        Gebetszeiten / Countdown / Datum / Wetter
-                    </section>
-                </main>
+                    {/* MITTE */}
+                    <main className="flex-1 flex items-center justify-center text-6xl font-bold">
+                        Hier kommen Gebetszeiten, Countdown usw.
+                    </main>
 
-                {/* FOOTER-BEREICH */}
-                <footer className="w-full">
-                    {/* Laufband / FooterTicker */}
-                    <div className="text-white text-2xl p-4 bg-[#111]">
-                        Footer Ticker / Dua / Hadith
-                    </div>
-                </footer>
-            </div>
+                    {/* FOOTER */}
+                    <footer className="w-full bg-neutral-900 border-t border-neutral-700 p-8 text-3xl text-neutral-300">
+                        Footer (Hadith / Dua / Laufband)
+                    </footer>
+                </div>
+            )}
         </AppShell>
     );
 }
