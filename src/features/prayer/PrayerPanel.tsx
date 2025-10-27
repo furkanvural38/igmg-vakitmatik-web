@@ -16,22 +16,19 @@ const DANGER = "#ff3b30";
 type PrayerKey = "fajr" | "sunrise" | "dhuhr" | "asr" | "maghrib" | "isha";
 
 const ICONS: Record<PrayerKey, JSX.Element> = {
-    fajr: <PiSunHorizonLight className="text-6xl mb-2" />,
-    sunrise: <HiOutlineSun className="text-6xl mb-2" />,
-    dhuhr: <AiFillSun className="text-6xl mb-2" />,
-    asr: <LuCloudSun className="text-6xl mb-2" />,
-    maghrib: <PiSunHorizonFill className="text-6xl mb-2" />,
-    isha: <FaMoon className="text-6xl mb-2" />,
+    fajr: <PiSunHorizonLight className="text-9xl mb-4" />,
+    sunrise: <HiOutlineSun className="text-9xl mb-4" />,
+    dhuhr: <AiFillSun className="text-9xl mb-4" />,
+    asr: <LuCloudSun className="text-9xl mb-4" />,
+    maghrib: <PiSunHorizonFill className="text-9xl mb-4" />,
+    isha: <FaMoon className="text-9xl mb-4" />,
 };
 
 export function PrayerPanel() {
     const { clock, prayerTimes, weather } = useCity();
 
-    const {
-        currentPrayer,
-        diffLabelShort,
-        progressPercentage,
-    } = usePrayerTimeLogic(clock, prayerTimes);
+    const { currentPrayer, diffLabelShort, progressPercentage } =
+        usePrayerTimeLogic(clock, prayerTimes);
 
     const titles = useChangeTitle();
 
@@ -58,19 +55,34 @@ export function PrayerPanel() {
     // aktive Farbe (grün normal, rot wenn >90%)
     const activeBgColor = progressPercentage > 90 ? DANGER : GREEN;
 
+    // türkische Labels wie in deinem alten Code
+    const PRAYER_LABELS: Record<PrayerKey, string> = {
+        fajr: "İmsak",
+        sunrise: "Güneş",
+        dhuhr: "Öğle",
+        asr: "İkindi",
+        maghrib: "Akşam",
+        isha: "Yatsı",
+    };
+
+    //
+    // Kachel-Klassen (angepasst auf altes Layout: w-box/h-box Gefühl)
+    //
     function tileClasses(isActive: boolean) {
-        if (isActive) {
-            return [
+        const base =
+            [
                 "relative flex flex-col justify-center items-center",
-                "rounded-xl shadow-lg px-6 py-4",
-                "text-white",
+                "rounded-3xl shadow-lg",
+                "w-[34rem] h-[34rem]",
+                "mt-30",
             ].join(" ");
+        if (isActive) {
+            return base + " text-white";
         }
-        return [
-            "relative flex flex-col justify-center items-center",
-            "rounded-xl shadow-lg px-6 py-4",
-            "bg-[#343434] text-white border border-[#5a5a5a]",
-        ].join(" ");
+        return (
+            base +
+            " bg-[#343434] text-white border border-[#5a5a5a]"
+        );
     }
 
     function tileInnerStyles(isActive: boolean) {
@@ -79,80 +91,123 @@ export function PrayerPanel() {
                 backgroundColor: activeBgColor,
                 boxShadow:
                     progressPercentage > 90
-                        ? "0 0 20px rgba(255,59,48,0.7)"
-                        : "0 0 20px rgba(0,153,114,0.7)",
+                        ? "0 0 30px rgba(255,59,48,0.7)"
+                        : "0 0 30px rgba(0,153,114,0.6)",
             };
         }
         return {};
     }
 
     return (
-        <div className="w-full flex flex-col items-center text-white select-none">
+        <div className="w-full flex flex-col items-stretch text-white select-none">
             {/* 1. OBERER BLOCK: Datum / Uhr / Wetter */}
-            <div className="flex flex-row items-start justify-between w-full max-w-[1800px] mb-10 gap-8 px-4">
+            <div className="flex flex-row items-center justify-between w-full px-10">
                 {/* Datum links */}
-                <div className="flex flex-col min-w-[260px]">
+                <div className="flex flex-col min-w-[400px]">
                     <div
-                        className="rounded-md px-4 py-2 text-2xl font-bold text-white text-center"
-                        style={{ backgroundColor: GREEN }}
+                        className="rounded-2xl px-8 py-6 text-white text-center font-semibold mb-6 shadow-lg"
+                        style={{
+                            backgroundColor: GREEN,
+                            fontSize: "6rem",
+                            lineHeight: 1.1,
+                        }}
                     >
                         {gregorianDate}
                     </div>
-                    <div className="rounded-md border border-[#5a5a5a] bg-black/60 px-4 py-2 text-2xl font-light text-white text-center mt-2">
+                    <div
+                        className="rounded-2xl border border-white bg-black/60 px-8 py-6 text-white text-center font-light shadow-md"
+                        style={{
+                            fontSize: "4rem",
+                            lineHeight: 1.1,
+                        }}
+                    >
                         {hijriDate}
                     </div>
                 </div>
 
                 {/* Uhrzeit in der Mitte */}
-                <div className="flex flex-row items-end justify-center text-white leading-none font-extrabold tracking-tight text-center">
-                    <div className="text-[120px] leading-[0.8]">
+                <div className="flex flex-row font-bebas text-clock items-end justify-center text-white leading-none font-extrabold tracking-tight text-center">
+                    <div className="text-clock leading-[0.8]">
                         {timeParts.hh}:{timeParts.mm}
                     </div>
-                    <div className="text-[64px] leading-[0.9] ml-2">
+                    <div className="text-seconds leading-[0.9] ml-2">
                         {timeParts.ss}
                     </div>
                 </div>
 
-                {/* Wetter rechts (ohne Countdown/Balken) */}
+                {/* Wetter rechts */}
                 <div
-                    className="flex flex-col rounded-md text-white w-[220px] px-4 py-4 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-[#1a1a1a]"
+                    className="
+                        flex flex-col items-center justify-center
+                        rounded-3xl
+                        shadow-[0_20px_60px_rgba(0,0,0,0.8)]
+                        border border-[#1a1a1a]
+                        text-white
+                        flex-shrink-0
+                        w-[34rem] h-[34rem]
+                    "
                     style={{
                         background:
                             "linear-gradient(to bottom right, #007CFF 0%, #00C0FF 50%, #00E5A0 100%)",
                     }}
                 >
-                    <div className="text-2xl font-bold leading-tight">
+                    {/* Stadtname */}
+                    <div
+                        className="font-semibold text-white leading-none text-center"
+                        style={{
+                            fontSize: "4rem",
+                            lineHeight: 1.1,
+                        }}
+                    >
                         {weather?.name ?? "—"}
                     </div>
 
-                    <div className="flex items-center gap-2 mt-2">
+                    {/* Wetter-Icon */}
+                    <div className="mt-4">
                         {weather?.weather?.[0]?.icon ? (
                             <img
                                 src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
                                 alt={weather.weather[0].description}
-                                className="w-10 h-10 object-contain"
+                                className="w-64 h-64 object-contain"
                             />
                         ) : (
-                            <div className="w-10 h-10" />
+                            <div className="w-64 h-64" />
                         )}
+                    </div>
 
-                        <div className="text-3xl font-semibold leading-none">
-                            {weather ? Math.round(weather.main.temp) + "°C" : "—"}
-                        </div>
+                    {/* Temperatur */}
+                    <div
+                        className="font-semibold text-white leading-none text-center"
+                        style={{
+                            fontSize: "6rem",
+                            lineHeight: 1.1,
+                        }}
+                    >
+                        {weather ? Math.round(weather.main.temp) + "°C" : "—"}
                     </div>
                 </div>
             </div>
 
             {/* 2. GEBETSZEIT-KACHELN */}
-            <div className="flex flex-row items-start justify-center gap-4 flex-wrap w-full max-w-[1800px]">
+            <div
+                className="
+                    w-full
+                    flex flex-row
+                    justify-between
+                    items-start
+                    px-10
+                    mt-24
+                    gap-10
+                "
+            >
                 {!prayerTimes ? (
                     <div className="text-2xl text-neutral-400">
                         Lade Gebetszeiten…
                     </div>
                 ) : (
-                    (Object.keys(titles) as PrayerKey[]).map((key) => {
+                    (Object.keys(PRAYER_LABELS) as PrayerKey[]).map((key) => {
                         const isActive = currentPrayer === key;
-                        const timeVal = (prayerTimes as any)[key] ?? "--:--";
+                        const timeVal = (prayerTimes as any)[key] ?? "00:00";
 
                         return (
                             <div
@@ -160,30 +215,28 @@ export function PrayerPanel() {
                                 className={tileClasses(isActive)}
                                 style={tileInnerStyles(isActive)}
                             >
-                                {/* Countdown+Progress gehören über die AKTIVE Kachel */}
+                                {/* Countdown + Fortschritt über aktiver Kachel */}
                                 {isActive && (
-                                    <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-full px-4 text-white">
-                                        {/* diffLabelShort wie "7h 53min" */}
-                                        <div className="text-center font-bold text-4xl mb-2">
+                                    <div className="absolute -top-44 left-1/2 -translate-x-1/2 w-full px-4 text-white">
+                                        {/* verbleibende Zeit */}
+                                        <div className="text-center text-white mb-4 text-8xl">
                                             {diffLabelShort}
                                         </div>
 
                                         {/* Fortschrittsbalken */}
-                                        <div className="w-full">
-                                            <div className="h-2 rounded-full bg-[#4b4b4b] overflow-hidden relative">
-                                                <div
-                                                    className="absolute left-0 top-0 h-full rounded-full"
-                                                    style={{
-                                                        width: `${progressPercentage}%`,
-                                                        backgroundColor:
-                                                            progressPercentage > 90 ? DANGER : GREEN,
-                                                        boxShadow:
-                                                            progressPercentage > 90
-                                                                ? "0 0 15px rgba(255,59,48,0.7)"
-                                                                : "0 0 15px rgba(0,153,114,0.7)",
-                                                    }}
-                                                />
-                                            </div>
+                                        <div
+                                            className={`h-8 relative w-full rounded-3xl overflow-hidden ${
+                                                progressPercentage > 90
+                                                    ? "bg-red-500"
+                                                    : "bg-[#009972]"
+                                            }`}
+                                        >
+                                            <div
+                                                className="bg-[#4b4b4b] rounded-3xl h-full"
+                                                style={{
+                                                    width: `${progressPercentage}%`,
+                                                }}
+                                            />
                                         </div>
                                     </div>
                                 )}
@@ -191,32 +244,49 @@ export function PrayerPanel() {
                                 {/* Icon */}
                                 <div
                                     className={
-                                        "mb-2 " +
-                                        (isActive ? "text-white" : "text-[#a7a7a7]")
+                                        (isActive
+                                            ? "text-white"
+                                            : "text-[#a7a7a7]") + " text-8xl mb-4"
                                     }
                                 >
                                     {ICONS[key]}
                                 </div>
 
-                                {/* dynamischer Titel (arabisch / türkisch rotiert) */}
-                                <div
+                                {/* rotierender Titel arabisch/latein */}
+                                <span
                                     className={
-                                        "text-3xl font-semibold mb-1 text-center " +
-                                        (isActive ? "text-white" : "text-[#a7a7a7]")
+                                        (isActive
+                                            ? "text-white"
+                                            : "text-[#a7a7a7]") +
+                                        " text-6xl mb-6"
                                     }
                                 >
-                                    {titles[key]}
-                                </div>
+                                    {titles[key] ?? "-"}
+                                </span>
 
-                                {/* Zeit */}
-                                <div
+                                {/* statischer Name wie İmsak / Güneş / ... */}
+                                <span
                                     className={
-                                        "text-4xl font-bold text-center " +
-                                        (isActive ? "text-white" : "text-[#a7a7a7]")
+                                        (isActive
+                                            ? "text-white"
+                                            : "text-[#a7a7a7]") +
+                                        " text-8xl font-semibold"
+                                    }
+                                >
+                                    {PRAYER_LABELS[key]}
+                                </span>
+
+                                {/* Uhrzeit */}
+                                <span
+                                    className={
+                                        (isActive
+                                            ? "text-white"
+                                            : "text-[#a7a7a7]") +
+                                        " font-semibold mt-4 text-[6rem] leading-none"
                                     }
                                 >
                                     {timeVal}
-                                </div>
+                                </span>
                             </div>
                         );
                     })

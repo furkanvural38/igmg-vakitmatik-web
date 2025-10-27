@@ -1,6 +1,6 @@
-// src/app/AppShell.tsx
 import React from "react";
 import { useScaleToScreen } from "../hooks/useScaleToScreen";
+import BgImage from "../assets/ressources/img.png";
 
 type AppShellProps = {
     children: React.ReactNode;
@@ -11,17 +11,12 @@ export function AppShell({ children }: AppShellProps) {
 
     return (
         <div
-            className="
-        bg-black
-        text-white
-        fixed
-        inset-0
-        overflow-hidden
-      "
+            className="fixed inset-0 flex items-center justify-center overflow-hidden text-white"
             style={{
-                // Hintergrund fullscreen schwarz, wie deine aktuelle App
+                backgroundColor: "#000", // außen bleibt schwarz
             }}
         >
+            {/* Skaliertes App-Fenster */}
             <div
                 style={{
                     position: "absolute",
@@ -31,14 +26,31 @@ export function AppShell({ children }: AppShellProps) {
                     top: `${offsetY}px`,
                     transform: `scale(${scale})`,
                     transformOrigin: "top left",
-                    // Wichtig: kein overflow, damit nichts verrutscht
-                    backgroundColor: "#000000",
-                    color: "#ffffff",
                 }}
-                className="select-none"
+                className="select-none relative"
             >
-                {/* Hier kommt dein eigentlicher Bildschirm-Inhalt rein */}
-                {children}
+                {/* === Hintergrundbild hinter allem === */}
+                <div
+                    className="absolute inset-0 -z-10"
+                    style={{
+                        //backgroundImage: `url(${BgImage})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center center",
+                        backgroundRepeat: "no-repeat",
+                    }}
+                />
+
+                {/* === Deine App-Inhalte (Header, Center, Footer) === */}
+                <div
+                    className="relative w-full h-full"
+                    style={{
+                        // du kannst das leicht abdunkeln falls Text schwer lesbar ist:
+                        // backgroundColor: "rgba(0,0,0,0.35)",
+                        backgroundColor: "transparent",
+                    }}
+                >
+                    {children}
+                </div>
             </div>
         </div>
     );

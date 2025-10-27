@@ -6,7 +6,6 @@ import AllahImg from "../../assets/ressources/ALLAH-image.png";
 import MuhammadImg from "../../assets/ressources/Muhammad-image.png";
 import DuaImg from "../../assets/ressources/dua-image.png";
 
-// wir mappen imageKey -> tatsächliches Bild
 function getImageForKey(key: string | undefined) {
     switch (key) {
         case "allah":
@@ -22,54 +21,41 @@ function getImageForKey(key: string | undefined) {
 
 export function FooterTicker() {
     const { dailyContent } = useCity();
-
-    // Rotationsindex
     const [index, setIndex] = useState(0);
 
-    // Alle 20 Sekunden zum nächsten Item springen
+    // Alle 20s weiterschalten
     useEffect(() => {
         const id = setInterval(() => {
             setIndex((prev) => {
                 if (!dailyContent?.items || dailyContent.items.length === 0) return 0;
                 return (prev + 1) % dailyContent.items.length;
             });
-        }, 20000); // 20s
-
+        }, 20000);
         return () => clearInterval(id);
     }, [dailyContent]);
 
-    // Welches Item ist aktiv?
     const activeItem = useMemo(() => {
-        if (!dailyContent || !dailyContent.items || dailyContent.items.length === 0) {
-            return null;
-        }
+        if (!dailyContent?.items || dailyContent.items.length === 0) return null;
         const safeIndex = index % dailyContent.items.length;
         return dailyContent.items[safeIndex];
     }, [dailyContent, index]);
 
-    // Für Auto-Scroll (Ticker-Effekt) brauchen wir refs,
-    // um zu checken, ob Text breiter ist als sichtbarer Bereich.
+    // Auto-Scroll Setup
     const containerRef = useRef<HTMLDivElement | null>(null);
     const contentRef = useRef<HTMLDivElement | null>(null);
-
-    // Wir steuern via inline-style transform, statt per fixed CSS-Animation,
-    // damit es nur scrollt, wenn nötig.
     const [scrollNeeded, setScrollNeeded] = useState(false);
     const [scrollX, setScrollX] = useState(0);
 
-    // Wenn aktiver Text länger als Container ist -> animiert schieben
+    // Check Overflow
     useEffect(() => {
         function checkWidth() {
             const c = containerRef.current;
             const d = contentRef.current;
             if (!c || !d) return;
-
-            // Wenn Content breiter als Container -> wir scrollen
             const needsScroll = d.scrollWidth > c.clientWidth;
             setScrollNeeded(needsScroll);
             setScrollX(0);
         }
-
         checkWidth();
         window.addEventListener("resize", checkWidth);
         return () => window.removeEventListener("resize", checkWidth);
@@ -78,31 +64,53 @@ export function FooterTicker() {
     // Smooth scroll logic
     useEffect(() => {
         if (!scrollNeeded) return;
-
         let frame: number;
         let x = 0;
-
         const step = () => {
-            x -= 0.5; // Geschwindigkeit
+            x -= 0.5;
             setScrollX(x);
             frame = requestAnimationFrame(step);
         };
-
         frame = requestAnimationFrame(step);
         return () => cancelAnimationFrame(frame);
     }, [scrollNeeded, activeItem]);
 
-    // Render
+    // RENDER
     return (
-        <footer className="w-full bg-neutral-900 border-t border-neutral-700 py-6 px-12 flex items-center overflow-hidden">
+        <footer
+            className="
+                w-full
+                flex
+                items-center
+                justify-start
+                text-white
+                rounded-4xl
+                mx-auto
+                h-[450px]
+            "
+            style={{
+                backgroundColor: "#343434", // wie alter Footer
+                minHeight: "12rem", // Höhe ähnlich h-footer / h-400
+                border: "1px solid rgba(255,255,255,0.15)",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.8)",
+            }}
+        >
             {!activeItem ? (
-                <div className="text-neutral-500 text-3xl font-light">
+                <div className="text-white text-5xl font-light pl-8">
                     Lade islamische Inhalte…
                 </div>
             ) : (
-                <div className="flex items-center w-full gap-8 text-white">
-                    {/* Bild/Icon-Badge links */}
-                    <div className="flex-shrink-0 flex items-center justify-center">
+                <>
+                    {/* LINKER BLOCK: Bild */}
+                    <div
+                        className="flex-shrink-0 flex items-center justify-center"
+                        style={{
+                            marginLeft: "0.5rem",
+                            marginRight: "2rem",
+                            height: "20rem", // alte h-400
+                            width: "20rem",
+                        }}
+                    >
                         {(() => {
                             const img = getImageForKey(activeItem.imageKey);
                             if (img) {
@@ -110,55 +118,80 @@ export function FooterTicker() {
                                     <img
                                         src={img}
                                         alt={activeItem.title}
-                                        className="w-24 h-24 object-contain drop-shadow-[0_0_20px_rgba(0,153,114,0.5)]"
+                                        style={{
+                                            height: "100%",
+                                            width: "100%",
+                                            objectFit: "contain",
+                                            filter:
+                                                "drop-shadow(0 0 20px rgba(0,153,114,0.5))",
+                                        }}
                                     />
                                 );
                             }
-                            // fallback: nur Text
                             return (
-                                <div className="text-4xl font-bold text-[#009972]">
+                                <div
+                                    className="text-[#009972] font-bold text-center"
+                                    style={{
+                                        fontSize: "4rem",
+                                        lineHeight: 1.1,
+                                    }}
+                                >
                                     {activeItem.title}
                                 </div>
                             );
                         })()}
                     </div>
 
-                    {/* Scroll-Container */}
+                    {/* RECHTER BLOCK: Lauftext */}
                     <div
+                        className="flex-grow flex items-center overflow-hidden"
                         ref={containerRef}
-                        className="relative flex-1 overflow-hidden"
                         style={{
-                            // dafür sorgen, dass Text nicht umbrechen darf
+                            height: "10rem",
                             whiteSpace: "nowrap",
                         }}
                     >
                         <div
                             ref={contentRef}
-                            className="text-4xl leading-snug font-light text-neutral-200"
                             style={{
                                 transform: scrollNeeded
                                     ? `translateX(${scrollX}px)`
                                     : "translateX(0)",
                                 willChange: "transform",
+                                display: "flex",
+                                alignItems: "center",
                             }}
                         >
-                            {/* Titel */}
-                            <span className="text-white font-semibold mr-8">
-                {activeItem.title}:
-              </span>
-
-                            {/* Haupttext */}
-                            <span>{activeItem.text}</span>
-
-                            {/* Quelle */}
-                            {activeItem.source ? (
-                                <span className="text-neutral-400 ml-12 text-3xl">
-                  {activeItem.source}
-                </span>
-                            ) : null}
+                            <p
+                                className="text-white font-light"
+                                style={{
+                                    fontSize: "4rem", // text-footer Größe
+                                    lineHeight: 1.2,
+                                }}
+                            >
+                                <span
+                                    className="font-semibold text-white"
+                                    style={{ marginRight: "2rem" }}
+                                >
+                                    {activeItem.title}:
+                                </span>
+                                <span>{activeItem.text}</span>
+                                {activeItem.source ? (
+                                    <span
+                                        style={{
+                                            marginLeft: "2rem",
+                                            color: "rgba(255,255,255,0.6)",
+                                            fontSize: "3rem",
+                                            lineHeight: 1.2,
+                                        }}
+                                    >
+                                        {activeItem.source}
+                                    </span>
+                                ) : null}
+                            </p>
                         </div>
                     </div>
-                </div>
+                </>
             )}
         </footer>
     );
