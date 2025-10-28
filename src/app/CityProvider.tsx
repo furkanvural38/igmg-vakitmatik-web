@@ -21,9 +21,9 @@ interface CityContextValue {
     loading: boolean;
     error: string | null;
     clock: Date;
-    prayerTimes: any | null;
-    weather: any | null;
-    dailyContent: any | null;
+    prayerTimes: PrayerTimes | null;
+    weather: WeatherData | null;
+    dailyContent: any | null; // dailyContent kannst du später auch typisieren
 }
 
 const CityContext = createContext<CityContextValue | undefined>(undefined);
