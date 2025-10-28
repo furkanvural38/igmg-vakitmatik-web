@@ -1,6 +1,7 @@
 // src/features/footerTicker/FooterTicker.tsx
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useCity } from "../../app/CityProvider";
+import { useVerticalScroll } from "../../hooks/useVerticalScroll";
 
 import AllahImg from "../../assets/ressources/ALLAH-image.png";
 import MuhammadImg from "../../assets/ressources/Muhammad-image.png";
@@ -23,7 +24,7 @@ export function FooterTicker() {
     const { dailyContent } = useCity();
     const [index, setIndex] = useState(0);
 
-    // Alle 20s weiterschalten
+    // alle 20 sekunden zum nächsten item
     useEffect(() => {
         const id = setInterval(() => {
             setIndex((prev) => {
@@ -31,51 +32,24 @@ export function FooterTicker() {
                 return (prev + 1) % dailyContent.items.length;
             });
         }, 20000);
+
         return () => clearInterval(id);
     }, [dailyContent]);
 
+    // aktives item auswählen
     const activeItem = useMemo(() => {
         if (!dailyContent?.items || dailyContent.items.length === 0) return null;
         const safeIndex = index % dailyContent.items.length;
         return dailyContent.items[safeIndex];
     }, [dailyContent, index]);
 
-    // Auto-Scroll Setup
-    const containerRef = useRef<HTMLDivElement | null>(null);
-    const contentRef = useRef<HTMLDivElement | null>(null);
-    const [scrollNeeded, setScrollNeeded] = useState(false);
-    const [scrollX, setScrollX] = useState(0);
+    // refs für auto-scroll nach unten
+    const containerRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
 
-    // Check Overflow
-    useEffect(() => {
-        function checkWidth() {
-            const c = containerRef.current;
-            const d = contentRef.current;
-            if (!c || !d) return;
-            const needsScroll = d.scrollWidth > c.clientWidth;
-            setScrollNeeded(needsScroll);
-            setScrollX(0);
-        }
-        checkWidth();
-        window.addEventListener("resize", checkWidth);
-        return () => window.removeEventListener("resize", checkWidth);
-    }, [activeItem]);
+    // hook aktivieren (scrollt vertikal von oben nach unten + loop)
+    useVerticalScroll(containerRef, contentRef);
 
-    // Smooth scroll logic
-    useEffect(() => {
-        if (!scrollNeeded) return;
-        let frame: number;
-        let x = 0;
-        const step = () => {
-            x -= 0.5;
-            setScrollX(x);
-            frame = requestAnimationFrame(step);
-        };
-        frame = requestAnimationFrame(step);
-        return () => cancelAnimationFrame(frame);
-    }, [scrollNeeded, activeItem]);
-
-    // RENDER
     return (
         <footer
             className="
@@ -84,30 +58,37 @@ export function FooterTicker() {
                 items-center
                 justify-start
                 text-white
-                rounded-4xl
                 mx-auto
+                rounded-3xl
                 h-[450px]
+                px-8
             "
             style={{
-                backgroundColor: "#343434", // wie alter Footer
-                minHeight: "12rem", // Höhe ähnlich h-footer / h-400
+                backgroundColor: "#343434",
                 border: "1px solid rgba(255,255,255,0.15)",
                 boxShadow: "0 20px 60px rgba(0,0,0,0.8)",
             }}
         >
             {!activeItem ? (
-                <div className="text-white text-5xl font-light pl-8">
+                <div
+                    className="text-white font-light flex items-center"
+                    style={{
+                        fontSize: "4rem",
+                        lineHeight: 1.2,
+                        paddingLeft: "2rem",
+                    }}
+                >
                     Lade islamische Inhalte…
                 </div>
             ) : (
                 <>
-                    {/* LINKER BLOCK: Bild */}
+                    {/* LINKER BLOCK: großes Bild */}
                     <div
                         className="flex-shrink-0 flex items-center justify-center"
                         style={{
                             marginLeft: "0.5rem",
                             marginRight: "2rem",
-                            height: "20rem", // alte h-400
+                            height: "20rem", // groß wie gewünscht
                             width: "20rem",
                         }}
                     >
@@ -122,12 +103,12 @@ export function FooterTicker() {
                                             height: "100%",
                                             width: "100%",
                                             objectFit: "contain",
-                                            filter:
-                                                "drop-shadow(0 0 20px rgba(0,153,114,0.5))",
+                                            filter: "drop-shadow(0 0 20px rgba(0,153,114,0.5))",
                                         }}
                                     />
                                 );
                             }
+                            // fallback falls kein bild-key
                             return (
                                 <div
                                     className="text-[#009972] font-bold text-center"
@@ -142,53 +123,58 @@ export function FooterTicker() {
                         })()}
                     </div>
 
-                    {/* RECHTER BLOCK: Lauftext */}
+                    {/* RECHTER BLOCK: vertikaler scroll-bereich */}
                     <div
-                        className="flex-grow flex items-center overflow-hidden"
                         ref={containerRef}
+                        className="
+                            flex-grow
+                            overflow-hidden
+                            flex
+                            justify-start
+                            items-start
+                        "
                         style={{
-                            height: "10rem",
-                            whiteSpace: "nowrap",
+                            // sichtfenster für den scroll
+                            height: "20rem",
                         }}
                     >
                         <div
                             ref={contentRef}
+                            className="
+                                flex
+                                flex-col
+                                justify-start
+                                items-start
+                                text-white
+                            "
                             style={{
-                                transform: scrollNeeded
-                                    ? `translateX(${scrollX}px)`
-                                    : "translateX(0)",
-                                willChange: "transform",
-                                display: "flex",
-                                alignItems: "center",
+                                rowGap: "2rem", // abstand zwischen zeilen/blöcken
                             }}
                         >
-                            <p
-                                className="text-white font-light"
+                            {/* Haupttext */}
+                            <div
+                                className="font-light text-white ml-8"
                                 style={{
-                                    fontSize: "4rem", // text-footer Größe
+                                    fontSize: "5rem",
                                     lineHeight: 1.2,
                                 }}
                             >
-                                <span
-                                    className="font-semibold text-white"
-                                    style={{ marginRight: "2rem" }}
+                                {activeItem.text}
+                            </div>
+
+                            {/* Quelle / Hadith-Quelle o.ä. */}
+                            {activeItem.source ? (
+                                <div
+                                    className="text-white ml-8"
+                                    style={{
+                                        fontSize: "4rem",
+                                        lineHeight: 1.2,
+                                        color: "rgba(255,255,255,0.6)",
+                                    }}
                                 >
-                                    {activeItem.title}:
-                                </span>
-                                <span>{activeItem.text}</span>
-                                {activeItem.source ? (
-                                    <span
-                                        style={{
-                                            marginLeft: "2rem",
-                                            color: "rgba(255,255,255,0.6)",
-                                            fontSize: "3rem",
-                                            lineHeight: 1.2,
-                                        }}
-                                    >
-                                        {activeItem.source}
-                                    </span>
-                                ) : null}
-                            </p>
+                                    {activeItem.source}
+                                </div>
+                            ) : null}
                         </div>
                     </div>
                 </>
