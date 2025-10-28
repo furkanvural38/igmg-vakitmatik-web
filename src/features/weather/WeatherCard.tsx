@@ -37,8 +37,9 @@ export function WeatherCard({
                 return "linear-gradient(to bottom, #0a1a3d 0%, #10284e 60%, #1b3a6b 100%)";
             case "sunrise":
                 // Sonnenaufgang: warme Orange- und Gelbtöne
-                return "linear-gradient(to bottom, #ff8c42 0%, #ffb347 50%, #ffe29f 100%)";
-            case "dhuhr":
+                return `radial-gradient(ellipse at top center, rgba(255,220,180,0.25) 0%, transparent 70%),
+                        linear-gradient(to bottom, #7a3e1d 0%, #b86b2a 45%, #e5b56a 100%)`;
+                case "dhuhr":
                 // Mittag: Standard-Design
                 return "linear-gradient(to bottom right, #007CFF 0%, #00C0FF 50%, #00E5A0 100%)";
             case "asr":
