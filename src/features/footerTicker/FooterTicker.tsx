@@ -130,50 +130,48 @@ export function FooterTicker() {
                             flex-grow
                             overflow-hidden
                             flex
-
+                            justify-center
+                            items-center
                         "
                         style={{
                             // sichtfenster für den scroll
-                            height: "20rem",
+                            height: "24rem",
                         }}
                     >
                         <div
                             ref={contentRef}
                             className="
-                             flex
+                                flex
                                 flex-col
-                                justify-center
-                                items-center
-                                text-white
-                                text-center
                                 w-full
-                                relative
+                                text-white
                             "
                             style={{
-                                rowGap: "2rem", // abstand zwischen zeilen/blöcken
+                                rowGap: "2rem", // abstand zwischen text und quelle
+                                // KEIN justify-center hier, damit contentRef richtige natürliche Höhe bekommt
+                                // Breite begrenzen, damit Text nicht von Rand zu Rand klatscht
+                                maxWidth: "100%",
                             }}
                         >
-                            {/* Haupttext */}
+                            {/* Haupttext (zentriert anzeigen) */}
                             <div
-                                className="font-light text-white"
+                                className="font-light text-white text-center mx-auto"
                                 style={{
-                                    fontSize: "5rem",
+                                    fontSize: "6rem",
                                     lineHeight: 1.2,
                                 }}
                             >
                                 {activeItem.text}
                             </div>
 
-                            {/* Quelle / Hadith-Quelle o.ä. */}
+                            {/* Quelle / Hadith-Quelle: immer letztes Element, rechts ausgerichtet */}
                             {activeItem.source ? (
                                 <div
-                                    className="text-white absolute"
+                                    className="text-white self-end text-right"
                                     style={{
-                                        fontSize: "4rem",
+                                        fontSize: "5rem",
                                         lineHeight: 1.2,
                                         color: "rgba(255,255,255,0.6)",
-                                        right: "0",
-                                        bottom: "0",
                                     }}
                                 >
                                     {activeItem.source}
