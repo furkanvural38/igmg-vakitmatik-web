@@ -14,7 +14,7 @@ import { WeatherCard } from "../weather/WeatherCard";
 const GREEN = "#009972";
 const DANGER = "#ff3b30";
 
-type PrayerKey = "fajr" | "sunrise" | "dhuhr" | "asr" | "maghrib" | "isha";
+export type PrayerKey = "fajr" | "sunrise" | "dhuhr" | "asr" | "maghrib" | "isha";
 
 const ICONS: Record<PrayerKey, JSX.Element> = {
     fajr: <PiSunHorizonLight className="text-9xl mb-4" />,
@@ -139,7 +139,9 @@ export function PrayerPanel(): JSX.Element {
                     icon={weather?.weather?.[0]?.icon}
                     description={weather?.weather?.[0]?.description}
                     temperatureC={weather?.main?.temp}
+                    currentPrayer={currentPrayer} // 🔥 diese Zeile neu!
                 />
+
             </div>
 
             {/* 2. GEBETSZEIT-KACHELN */}
