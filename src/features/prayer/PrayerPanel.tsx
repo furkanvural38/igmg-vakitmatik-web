@@ -164,9 +164,8 @@ export function PrayerPanel(): JSX.Element {
                     (Object.keys(PRAYER_LABELS) as PrayerKey[]).map(
                         (key) => {
                             const isActive = currentPrayer === key;
-                            const timeVal =
-                                (prayerTimes as Record<string, string>)[key] ??
-                                "00:00";
+                            const timeVal = prayerTimes[key as keyof typeof PRAYER_LABELS] ?? "00:00";
+
 
                             return (
                                 <div
