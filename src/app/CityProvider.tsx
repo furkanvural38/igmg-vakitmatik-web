@@ -11,127 +11,90 @@ import { cityConfigs, type CityKey, type CityConfig } from "../lib/cities";
 import {
     fetchPrayerTimesWithFallback,
     fetchWeather,
-    type PrayerTimes,
-    type WeatherData,
 } from "../lib/api";
-import { useClock } from "../hooks/useClock";
-import {type DailyContentResult, fetchDailyIslamContent} from "../features/footerTicker/apiDailyContent";
+import { fetchDailyIslamContent} from "../features/footerTicker/apiDailyContent";
 
-
-export interface CityContextValue {
-    cityKey: CityKey | null;
-    config: CityConfig | null;
+interface CityContextValue {
+    cityKey: CityKey | string;
+    config?: CityConfig;
     isValidCity: boolean;
-
     loading: boolean;
     error: string | null;
-
     clock: Date;
-    prayerTimes: PrayerTimes | null;
-    weather: WeatherData | null;
-
-    dailyContent: DailyContentResult | null;
+    prayerTimes: any | null;
+    weather: any | null;
+    dailyContent: any | null;
 }
 
-const CityContext = createContext<CityContextValue | null>(null);
+const CityContext = createContext<CityContextValue | undefined>(undefined);
 
 export function CityProvider({ children }: { children: React.ReactNode }) {
-    const { cityKey } = useParams();
-    const key = cityKey as CityKey | undefined;
-    const config = key ? cityConfigs[key] : undefined;
+    const { cityKey = "" } = useParams();
+    const [clock, setClock] = useState(new Date());
+    const [prayerTimes, setPrayerTimes] = useState<any | null>(null);
+    const [weather, setWeather] = useState<any | null>(null);
+    const [dailyContent, setDailyContent] = useState<any | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    // city config
+    const config = useMemo(() => {
+        return cityConfigs[cityKey as keyof typeof cityConfigs];
+    }, [cityKey]);
+
     const isValidCity = !!config;
 
-    const clock = useClock(1000);
-
-    const [dailyContent, setDailyContent] = useState<DailyContentResult | null>(null);
-    const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
-    const [weather, setWeather] = useState<WeatherData | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-
-    // Daten laden, sobald cityKey wechselt
+    // clock ticker
     useEffect(() => {
-        if (!config) {
-            setError("Unbekannte Stadt");
+        const id = setInterval(() => {
+            setClock(new Date());
+        }, 1000);
+        return () => clearInterval(id);
+    }, []);
+
+    // daten laden wenn city valid
+    useEffect(() => {
+        if (!isValidCity) {
+            setError("Ungültige Stadt");
             setLoading(false);
-            setPrayerTimes(null);
-            setWeather(null);
             return;
         }
 
-        let cancelled = false;
+        setLoading(true);
+        setError(null);
 
-        async function load() {
-            setLoading(true);
-            setError(null);
-
+        (async () => {
             try {
-                // Gebetszeiten
-                const pTimes = await fetchPrayerTimesWithFallback(
-                    config.prayerApiUrl,
-                    config.excelFallbackSheet
-                );
+                // ⬇ diese drei Zeilen sind die Kandidaten für TS18048:
+                //    config könnte theoretisch undefined sein.
+                const [prayer, weatherResp, daily] = await Promise.all([
+                    fetchPrayerTimesWithFallback(config!.prayerApiUrl),
+                    fetchWeather(config!.weatherCityName),
+                    fetchDailyIslamContent(),
+                ]);
 
-                // Wetter (darf failen ohne alles abzubrechen)
-                let wData: WeatherData | null = null;
-                try {
-                    wData = await fetchWeather(config.weatherCityName);
-                } catch (innerErr) {
-                    console.error("Weather fetch failed:", innerErr);
-                }
-
-                // Daily Islam Content
-                let dContent: DailyContentResult | null = null;
-                try {
-                    dContent = await fetchDailyIslamContent();
-                } catch (innerErr) {
-                    console.error("Daily content fetch failed:", innerErr);
-                }
-
-                if (!cancelled) {
-                    setPrayerTimes(pTimes);
-                    setWeather(wData);
-                    setDailyContent(dContent);
-                }
-            } catch (err) {
-                if (!cancelled) {
-                    console.error("CityProvider load error:", err);
-                    setError("Fehler beim Laden der Daten");
-                }
+                setPrayerTimes(prayer);
+                setWeather(weatherResp);
+                setDailyContent(daily);
+            } catch (err: any) {
+                setError(err?.message ?? "Fehler beim Laden");
             } finally {
-                if (!cancelled) {
-                    setLoading(false);
-                }
+                setLoading(false);
             }
-        }
+        })();
+    }, [isValidCity, config]);
 
-
-        load();
-
-        // Wetter ggf. periodisch neu laden (z. B. jede Stunde) → später
-        return () => {
-            cancelled = true;
-        };
-    }, [config]);
-
-    const value = useMemo<CityContextValue>(
-        () => ({
-            cityKey: key ?? null,
-            config: config ?? null,
-            isValidCity,
-
-            loading,
-            error,
-
-            clock,
-            prayerTimes,
-            weather,
-
-            dailyContent,
-        }),
-        [key, config, isValidCity, loading, error, clock, prayerTimes, weather, dailyContent]
-    );
-
+    const value: CityContextValue = {
+        cityKey,
+        config,
+        isValidCity,
+        loading,
+        error,
+        clock,
+        prayerTimes,
+        weather,
+        dailyContent,
+    };
 
     return <CityContext.Provider value={value}>{children}</CityContext.Provider>;
 }
@@ -139,7 +102,7 @@ export function CityProvider({ children }: { children: React.ReactNode }) {
 export function useCity() {
     const ctx = useContext(CityContext);
     if (!ctx) {
-        throw new Error("useCity() must be used inside <CityProvider />");
+        throw new Error("useCity must be used within CityProvider");
     }
     return ctx;
 }

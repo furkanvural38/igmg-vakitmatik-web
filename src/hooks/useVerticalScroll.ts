@@ -1,23 +1,18 @@
-import { useEffect, type RefObject } from "react";
+// src/hooks/useVerticalScroll.ts
+import { type RefObject, useEffect } from "react";
 
 export const useVerticalScroll = (
-    scrollContainerRef: RefObject<HTMLDivElement>,
-    contentRef: RefObject<HTMLDivElement>
+    scrollContainerRef: RefObject<HTMLDivElement | null>,
+    contentRef: RefObject<HTMLDivElement | null>
 ) => {
     useEffect(() => {
         const scrollContainer = scrollContainerRef.current;
         const content = contentRef.current;
-
         if (!scrollContainer || !content) return;
 
         let scrollAmount = 0;
         let scrollInterval: number | null = null;
         let pauseTimeout: number | null = null;
-
-        const shouldScroll = () => {
-            // nur scrollen, wenn der Inhalt deutlich höher ist als das Sichtfenster
-            return content.scrollHeight > scrollContainer.clientHeight * 1.1;
-        };
 
         const clearTimers = () => {
             if (scrollInterval !== null) {
@@ -30,50 +25,51 @@ export const useVerticalScroll = (
             }
         };
 
-        const startScrolling = () => {
-            // Reset nach oben
+        const shouldScroll = () => {
+            return content.scrollHeight > scrollContainer.clientHeight * 1.1;
+        };
+
+        const startCycle = () => {
+            clearTimers();
+
+            // Reset ganz nach oben
             scrollAmount = 0;
             scrollContainer.scrollTop = 0;
 
-            // Safety: falls vorher noch Timer laufen → killen
-            clearTimers();
-
-            // Autoscroll Loop
-            scrollInterval = window.setInterval(() => {
-                scrollAmount += 1; // Schrittweite (px pro Tick)
-                scrollContainer.scrollTop = scrollAmount;
-
+            // 2s oben zeigen
+            pauseTimeout = window.setTimeout(() => {
                 const maxScroll =
                     content.scrollHeight - scrollContainer.clientHeight;
 
-                // Ende erreicht?
-                if (scrollAmount >= maxScroll) {
-                    clearTimers();
+                scrollInterval = window.setInterval(() => {
+                    // erst setzen
+                    scrollContainer.scrollTop = scrollAmount;
+                    // dann erhöhen
+                    scrollAmount += 1;
 
-                    // kurze Pause unten, dann zurückspringen
-                    pauseTimeout = window.setTimeout(() => {
-                        scrollAmount = 0;
-                        scrollContainer.scrollTop = 0;
-                        startScrolling(); // restart
-                    }, 1000); // 1 Sekunde warten am Ende
-                }
-            }, 30); // Intervall-Geschwindigkeit (ms zwischen jedem Pixel)
+                    // unten angekommen?
+                    if (scrollAmount >= maxScroll) {
+                        clearTimers();
+
+                        // 1s unten stehen bleiben, dann Loop neu
+                        pauseTimeout = window.setTimeout(() => {
+                            startCycle();
+                        }, 1000);
+                    }
+                }, 30);
+            }, 1000);
         };
 
-        // Initial starten falls nötig
         if (shouldScroll()) {
-            startScrolling();
+            startCycle();
         }
 
-        // Auf Größen / Text-Änderungen reagieren
         const resizeObserver = new ResizeObserver(() => {
-            // Reset + neu entscheiden
             clearTimers();
             scrollAmount = 0;
             scrollContainer.scrollTop = 0;
-
             if (shouldScroll()) {
-                startScrolling();
+                startCycle();
             }
         });
 

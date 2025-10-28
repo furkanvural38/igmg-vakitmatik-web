@@ -90,10 +90,6 @@ export async function fetchWeather(cityName: string): Promise<WeatherData | null
     // ⚠️ Stell sicher, dass du hier deinen echten OpenWeatherMap-API-Key einträgst
     const OPENWEATHER_API_KEY = "6847fff1ba1440395c9624c98a44f3f0";
 
-    if (!OPENWEATHER_API_KEY || OPENWEATHER_API_KEY === "DEIN_OPENWEATHER_KEY_HIER") {
-        console.warn("Kein gültiger OpenWeatherMap API Key gesetzt.");
-        return null;
-    }
 
     try {
         const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(

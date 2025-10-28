@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import  {type JSX, useMemo} from "react";
 import { useCity } from "../../app/CityProvider";
 import { usePrayerTimeLogic } from "./usePrayerTimeLogic";
 
