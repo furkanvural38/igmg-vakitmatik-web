@@ -154,7 +154,7 @@ export function FooterTicker() {
                         >
                             {/* Haupttext (zentriert anzeigen) */}
                             <div
-                                className="font-light text-white text-center mt-16"
+                                className="text-white text-center mt-16"
                                 style={{
                                     fontSize: "6rem",
                                     lineHeight: 1.2,
