@@ -33,7 +33,6 @@ export function AppShell({ children }: AppShellProps) {
                 <div
                     className="absolute inset-0 -z-10"
                     style={{
-                        //backgroundImage: `url(${BgImage})`,
                         backgroundSize: "cover",
                         backgroundPosition: "center center",
                         backgroundRepeat: "no-repeat",

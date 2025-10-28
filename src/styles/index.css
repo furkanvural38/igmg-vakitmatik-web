@@ -30,7 +30,6 @@ body {
     color: #fff;
 
     background-color: #000;
-    background-image: url("../assets/ressources/img.png"); /* <- WICHTIG bei src/styles/index.css */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
