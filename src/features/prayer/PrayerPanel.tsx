@@ -1,4 +1,4 @@
-import  {type JSX, useMemo} from "react";
+import { type JSX, useMemo } from "react";
 import { useCity } from "../../app/CityProvider";
 import { usePrayerTimeLogic } from "./usePrayerTimeLogic";
 
@@ -9,6 +9,7 @@ import { PiSunHorizonFill, PiSunHorizonLight } from "react-icons/pi";
 import { LuCloudSun } from "react-icons/lu";
 
 import { useChangeTitle } from "./useChangeTitle";
+import { WeatherCard } from "../weather/WeatherCard";
 
 const GREEN = "#009972";
 const DANGER = "#ff3b30";
@@ -24,7 +25,7 @@ const ICONS: Record<PrayerKey, JSX.Element> = {
     isha: <FaMoon className="text-9xl mb-4" />,
 };
 
-export function PrayerPanel() {
+export function PrayerPanel(): JSX.Element {
     const { clock, prayerTimes, weather } = useCity();
 
     const { currentPrayer, diffLabelShort, progressPercentage } =
@@ -49,12 +50,13 @@ export function PrayerPanel() {
         return `${dd}.${mo}.${yyyy}`;
     }, [clock]);
 
+    // Hijri-Datum (kommt aus prayerTimes)
     const hijriDate = prayerTimes?.hijriDateLong ?? "--";
 
     // aktive Farbe (grün normal, rot wenn >90%)
     const activeBgColor = progressPercentage > 90 ? DANGER : GREEN;
 
-    // türkische Labels wie in deinem alten Code
+    // türkische Labels für die einzelnen Gebete
     const PRAYER_LABELS: Record<PrayerKey, string> = {
         fajr: "İmsak",
         sunrise: "Güneş",
@@ -65,26 +67,27 @@ export function PrayerPanel() {
     };
 
     //
-    // Kachel-Klassen (angepasst auf altes Layout: w-box/h-box Gefühl)
+    // Hilfsfunktionen für Styling der Gebets-Kacheln
     //
-    function tileClasses(isActive: boolean) {
-        const base =
-            [
-                "relative flex flex-col justify-center items-center",
-                "rounded-3xl shadow-lg",
-                "w-[34rem] h-[34rem]",
-                "mt-30",
-            ].join(" ");
+    function tileClasses(isActive: boolean): string {
+        const base = [
+            "relative flex flex-col justify-center items-center",
+            "rounded-3xl shadow-lg",
+            "w-[34rem] h-[34rem]",
+            "mt-30",
+        ].join(" ");
+
         if (isActive) {
             return base + " text-white";
         }
+
         return (
             base +
             " bg-[#343434] text-white border border-[#5a5a5a]"
         );
     }
 
-    function tileInnerStyles(isActive: boolean) {
+    function tileInnerStyles(isActive: boolean): React.CSSProperties {
         if (isActive) {
             return {
                 backgroundColor: activeBgColor,
@@ -130,57 +133,13 @@ export function PrayerPanel() {
                     </div>
                 </div>
 
-                {/* Wetter rechts */}
-                <div
-                    className="
-                        flex flex-col items-center justify-center
-                        rounded-3xl
-                        shadow-[0_20px_60px_rgba(0,0,0,0.8)]
-                        border border-[#1a1a1a]
-                        text-white
-                        flex-shrink-0
-                        w-[34rem] h-[34rem]
-                    "
-                    style={{
-                        background:
-                            "linear-gradient(to bottom right, #007CFF 0%, #00C0FF 50%, #00E5A0 100%)",
-                    }}
-                >
-                    {/* Stadtname */}
-                    <div
-                        className="font-semibold text-white leading-none text-center"
-                        style={{
-                            fontSize: "4.5rem",
-                            lineHeight: 1.1,
-                        }}
-                    >
-                        {weather?.name ?? "—"}
-                    </div>
-
-                    {/* Wetter-Icon */}
-                    <div className="mt-4">
-                        {weather?.weather?.[0]?.icon ? (
-                            <img
-                                src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
-                                alt={weather.weather[0].description}
-                                className="w-64 h-64 object-contain"
-                            />
-                        ) : (
-                            <div className="w-64 h-64" />
-                        )}
-                    </div>
-
-                    {/* Temperatur */}
-                    <div
-                        className="font-semibold text-white leading-none text-center"
-                        style={{
-                            fontSize: "7rem",
-                            lineHeight: 1.1,
-                        }}
-                    >
-                        {weather ? Math.round(weather.main.temp) + "°C" : "—"}
-                    </div>
-                </div>
+                {/* Wetter rechts (ausgelagert) */}
+                <WeatherCard
+                    cityName={weather?.name}
+                    icon={weather?.weather?.[0]?.icon}
+                    description={weather?.weather?.[0]?.description}
+                    temperatureC={weather?.main?.temp}
+                />
             </div>
 
             {/* 2. GEBETSZEIT-KACHELN */}
@@ -200,91 +159,92 @@ export function PrayerPanel() {
                         Lade Gebetszeiten…
                     </div>
                 ) : (
-                    (Object.keys(PRAYER_LABELS) as PrayerKey[]).map((key) => {
-                        const isActive = currentPrayer === key;
-                        const timeVal = (prayerTimes as any)[key] ?? "00:00";
+                    (Object.keys(PRAYER_LABELS) as PrayerKey[]).map(
+                        (key) => {
+                            const isActive = currentPrayer === key;
+                            const timeVal =
+                                (prayerTimes as Record<string, string>)[key] ??
+                                "00:00";
 
-                        return (
-                            <div
-                                key={key}
-                                className={tileClasses(isActive)}
-                                style={tileInnerStyles(isActive)}
-                            >
-                                {/* Countdown + Fortschritt über aktiver Kachel */}
-                                {isActive && (
-                                    <div className="absolute -top-44 left-1/2 -translate-x-1/2 w-full px-4 text-white">
-                                        {/* verbleibende Zeit */}
-                                        <div className="text-center text-white mb-4 text-8xl">
-                                            {diffLabelShort}
-                                        </div>
-
-                                        {/* Fortschrittsbalken */}
-                                        <div
-                                            className={`h-8 relative w-full rounded-3xl overflow-hidden ${
-                                                progressPercentage > 90
-                                                    ? "bg-red-500"
-                                                    : "bg-[#009972]"
-                                            }`}
-                                        >
-                                            <div
-                                                className="bg-[#4b4b4b] rounded-3xl h-full"
-                                                style={{
-                                                    width: `${progressPercentage}%`,
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Icon */}
+                            return (
                                 <div
-                                    className={
-                                        (isActive
-                                            ? "text-white"
-                                            : "text-[#a7a7a7]") + " text-8xl mb-4"
-                                    }
+                                    key={key}
+                                    className={tileClasses(isActive)}
+                                    style={tileInnerStyles(isActive)}
                                 >
-                                    {ICONS[key]}
+                                    {/* Countdown + Fortschritt über aktiver Kachel */}
+                                    {isActive && (
+                                        <div className="absolute -top-44 left-1/2 -translate-x-1/2 w-full px-4 text-white">
+                                            {/* verbleibende Zeit */}
+                                            <div className="text-center text-white mb-4 text-8xl">
+                                                {diffLabelShort}
+                                            </div>
+
+                                            {/* Fortschrittsbalken */}
+                                            <div
+                                                className={`h-8 relative w-full rounded-3xl overflow-hidden ${
+                                                    progressPercentage > 90
+                                                        ? "bg-red-500"
+                                                        : "bg-[#009972]"
+                                                }`}
+                                            >
+                                                <div
+                                                    className="bg-[#4b4b4b] rounded-3xl h-full"
+                                                    style={{
+                                                        width: `${progressPercentage}%`,
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Icon */}
+                                    <div
+                                        className={`${
+                                            isActive
+                                                ? "text-white"
+                                                : "text-[#a7a7a7]"
+                                        } text-8xl mb-4`}
+                                    >
+                                        {ICONS[key]}
+                                    </div>
+
+                                    {/* rotierender Titel arabisch/latein */}
+                                    <span
+                                        className={`${
+                                            isActive
+                                                ? "text-white"
+                                                : "text-[#a7a7a7]"
+                                        } text-6xl mb-6`}
+                                    >
+                                        {titles[key] ?? "-"}
+                                    </span>
+
+                                    {/* statischer Name wie İmsak / Güneş / ... */}
+                                    <span
+                                        className={`${
+                                            isActive
+                                                ? "text-white"
+                                                : "text-[#a7a7a7]"
+                                        } text-8xl font-semibold`}
+                                    >
+                                        {PRAYER_LABELS[key]}
+                                    </span>
+
+                                    {/* Uhrzeit */}
+                                    <span
+                                        className={`${
+                                            isActive
+                                                ? "text-white"
+                                                : "text-[#a7a7a7]"
+                                        } font-semibold mt-4 text-[7rem] leading-none`}
+                                    >
+                                        {timeVal}
+                                    </span>
                                 </div>
-
-                                {/* rotierender Titel arabisch/latein */}
-                                <span
-                                    className={
-                                        (isActive
-                                            ? "text-white"
-                                            : "text-[#a7a7a7]") +
-                                        " text-6xl mb-6"
-                                    }
-                                >
-                                    {titles[key] ?? "-"}
-                                </span>
-
-                                {/* statischer Name wie İmsak / Güneş / ... */}
-                                <span
-                                    className={
-                                        (isActive
-                                            ? "text-white"
-                                            : "text-[#a7a7a7]") +
-                                        " text-8xl font-semibold"
-                                    }
-                                >
-                                    {PRAYER_LABELS[key]}
-                                </span>
-
-                                {/* Uhrzeit */}
-                                <span
-                                    className={
-                                        (isActive
-                                            ? "text-white"
-                                            : "text-[#a7a7a7]") +
-                                        " font-semibold mt-4 text-[7rem] leading-none"
-                                    }
-                                >
-                                    {timeVal}
-                                </span>
-                            </div>
-                        );
-                    })
+                            );
+                        }
+                    )
                 )}
             </div>
         </div>
