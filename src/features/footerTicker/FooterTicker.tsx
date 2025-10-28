@@ -130,8 +130,7 @@ export function FooterTicker() {
                             flex-grow
                             overflow-hidden
                             flex
-                            justify-start
-                            items-start
+
                         "
                         style={{
                             // sichtfenster für den scroll
@@ -141,11 +140,14 @@ export function FooterTicker() {
                         <div
                             ref={contentRef}
                             className="
-                                flex
+                             flex
                                 flex-col
-                                justify-start
-                                items-start
+                                justify-center
+                                items-center
                                 text-white
+                                text-center
+                                w-full
+                                relative
                             "
                             style={{
                                 rowGap: "2rem", // abstand zwischen zeilen/blöcken
@@ -153,7 +155,7 @@ export function FooterTicker() {
                         >
                             {/* Haupttext */}
                             <div
-                                className="font-light text-white ml-8"
+                                className="font-light text-white"
                                 style={{
                                     fontSize: "5rem",
                                     lineHeight: 1.2,
@@ -165,11 +167,13 @@ export function FooterTicker() {
                             {/* Quelle / Hadith-Quelle o.ä. */}
                             {activeItem.source ? (
                                 <div
-                                    className="text-white ml-8"
+                                    className="text-white absolute"
                                     style={{
                                         fontSize: "4rem",
                                         lineHeight: 1.2,
                                         color: "rgba(255,255,255,0.6)",
+                                        right: "0",
+                                        bottom: "0",
                                     }}
                                 >
                                     {activeItem.source}

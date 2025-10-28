@@ -117,7 +117,7 @@ export function PrayerPanel() {
                     <div
                         className="rounded-2xl border border-white bg-black/60 px-8 py-6 text-white text-center font-light shadow-md"
                         style={{
-                            fontSize: "4rem",
+                            fontSize: "5rem",
                             lineHeight: 1.1,
                         }}
                     >
