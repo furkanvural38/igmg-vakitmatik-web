@@ -88,8 +88,8 @@ export function FooterTicker() {
                         style={{
                             marginLeft: "0.5rem",
                             marginRight: "2rem",
-                            height: "20rem", // groß wie gewünscht
-                            width: "20rem",
+                            height: "22rem", // groß wie gewünscht
+                            width: "22rem",
                         }}
                     >
                         {(() => {
@@ -155,7 +155,7 @@ export function FooterTicker() {
                         >
                             {/* Haupttext (zentriert anzeigen) */}
                             <div
-                                className="font-light text-white text-center mx-auto"
+                                className="font-light text-white text-center"
                                 style={{
                                     fontSize: "6rem",
                                     lineHeight: 1.2,
