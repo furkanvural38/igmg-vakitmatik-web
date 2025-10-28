@@ -41,7 +41,7 @@ export const cityConfigs: Record<CityKey, CityConfig> = {
         excelFallbackSheet: "braunschweig",
     },
     garbsen: {
-        mosqueName: "GARBSEN CAMİ", // <- anpassen
+        mosqueName: "GARBSEN ŞUBESİ EYÜP SULTAN CÂMİ-İ", // <- anpassen
         weatherCityName: "Garbsen",
         prayerApiUrl: "https://igmg-namaz.synology.me:3838/garbsen",
         excelFallbackSheet: "garbsen",
