@@ -154,7 +154,7 @@ export function PrayerPanel() {
                     <div
                         className="font-semibold text-white leading-none text-center"
                         style={{
-                            fontSize: "4rem",
+                            fontSize: "4.5rem",
                             lineHeight: 1.1,
                         }}
                     >
@@ -178,7 +178,7 @@ export function PrayerPanel() {
                     <div
                         className="font-semibold text-white leading-none text-center"
                         style={{
-                            fontSize: "6rem",
+                            fontSize: "7rem",
                             lineHeight: 1.1,
                         }}
                     >
