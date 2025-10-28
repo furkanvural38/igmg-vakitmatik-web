@@ -103,7 +103,6 @@ export function FooterTicker() {
                                             height: "100%",
                                             width: "100%",
                                             objectFit: "contain",
-                                            filter: "drop-shadow(0 0 20px rgba(0,153,114,0.5))",
                                         }}
                                     />
                                 );
@@ -155,7 +154,7 @@ export function FooterTicker() {
                         >
                             {/* Haupttext (zentriert anzeigen) */}
                             <div
-                                className="font-light text-white text-center"
+                                className="font-light text-white text-center mt-16"
                                 style={{
                                     fontSize: "6rem",
                                     lineHeight: 1.2,
@@ -171,7 +170,6 @@ export function FooterTicker() {
                                     style={{
                                         fontSize: "5rem",
                                         lineHeight: 1.2,
-                                        color: "rgba(255,255,255,0.6)",
                                     }}
                                 >
                                     {activeItem.source}

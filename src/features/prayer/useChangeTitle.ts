@@ -9,12 +9,12 @@ interface PrayerTitle {
 }
 
 const prayerTitles: Record<PrayerKey, PrayerTitle> = {
-    fajr: { arabic: "الصلاة الفجر", latin: "İmsak" },
-    sunrise: { arabic: "الشروق", latin: "Güneş" },
-    dhuhr: { arabic: "الصلاة الظهر", latin: "Öğle" },
-    asr: { arabic: "الصلاة العصر", latin: "İkindi" },
-    maghrib: { arabic: "الصلاة المغرب", latin: "Akşam" },
-    isha: { arabic: "الصلاة العشاء", latin: "Yatsı" },
+    fajr: { arabic: "الصلاة الفجر", latin: "Fajr" },
+    sunrise: { arabic: "الشروق", latin: "Shuruq" },
+    dhuhr: { arabic: "الصلاة الظهر", latin: "Dhuhr" },
+    asr: { arabic: "الصلاة العصر", latin: "Asr" },
+    maghrib: { arabic: "الصلاة المغرب", latin: "Maghrib" },
+    isha: { arabic: "الصلاة العشاء", latin: "Isha\'a" },
 };
 
 export function useChangeTitle() {

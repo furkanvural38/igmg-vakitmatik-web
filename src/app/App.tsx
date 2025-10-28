@@ -37,7 +37,7 @@ export default function App() {
                 <div className="flex flex-col w-full h-full text-white bg-transparent">
 
                 {/* HEADER */}
-                    <header className="w-full border-b border-neutral-700 pl-8 pr-0 py-8 flex items-start justify-between">
+                    <header className="w-full pl-8 pr-0 py-8 flex items-start justify-between">
                         <TopHeader />
                     </header>
 

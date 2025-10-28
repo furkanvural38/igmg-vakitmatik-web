@@ -49,7 +49,6 @@ export function PrayerPanel() {
         return `${dd}.${mo}.${yyyy}`;
     }, [clock]);
 
-    // TODO später dynamisch aus API
     const hijriDate = prayerTimes?.hijriDateLong ?? "--";
 
     // aktive Farbe (grün normal, rot wenn >90%)
@@ -282,7 +281,7 @@ export function PrayerPanel() {
                                         (isActive
                                             ? "text-white"
                                             : "text-[#a7a7a7]") +
-                                        " font-semibold mt-4 text-[6rem] leading-none"
+                                        " font-semibold mt-4 text-[7rem] leading-none"
                                     }
                                 >
                                     {timeVal}
