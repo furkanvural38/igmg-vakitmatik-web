@@ -88,10 +88,6 @@ export function PrayerPanel() {
         if (isActive) {
             return {
                 backgroundColor: activeBgColor,
-                boxShadow:
-                    progressPercentage > 90
-                        ? "0 0 30px rgba(255,59,48,0.7)"
-                        : "0 0 30px rgba(0,153,114,0.6)",
             };
         }
         return {};
