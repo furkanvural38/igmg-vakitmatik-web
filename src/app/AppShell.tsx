@@ -1,6 +1,5 @@
 import React from "react";
 import { useScaleToScreen } from "../hooks/useScaleToScreen";
-import BgImage from "../assets/ressources/img.png";
 
 type AppShellProps = {
     children: React.ReactNode;
