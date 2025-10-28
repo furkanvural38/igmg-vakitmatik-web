@@ -50,7 +50,7 @@ export function PrayerPanel() {
     }, [clock]);
 
     // TODO später dynamisch aus API
-    const hijriDate = "5 CemaziyelEvvel 1447";
+    const hijriDate = prayerTimes?.hijriDateLong ?? "--";
 
     // aktive Farbe (grün normal, rot wenn >90%)
     const activeBgColor = progressPercentage > 90 ? DANGER : GREEN;

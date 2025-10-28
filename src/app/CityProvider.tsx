@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 import { cityConfigs, type CityKey, type CityConfig } from "../lib/cities";
 import {
     fetchPrayerTimesWithFallback,
-    fetchWeather,
+    fetchWeather, type PrayerTimes, type WeatherData,
 } from "../lib/api";
 import { fetchDailyIslamContent} from "../features/footerTicker/apiDailyContent";
 
@@ -31,8 +31,8 @@ const CityContext = createContext<CityContextValue | undefined>(undefined);
 export function CityProvider({ children }: { children: React.ReactNode }) {
     const { cityKey = "" } = useParams();
     const [clock, setClock] = useState(new Date());
-    const [prayerTimes, setPrayerTimes] = useState<any | null>(null);
-    const [weather, setWeather] = useState<any | null>(null);
+    const [prayerTimes, setPrayerTimes] = useState<PrayerTimes  | null>(null);
+    const [weather, setWeather] = useState<WeatherData  | null>(null);
     const [dailyContent, setDailyContent] = useState<any | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);

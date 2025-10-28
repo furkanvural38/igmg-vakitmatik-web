@@ -2,6 +2,7 @@
 // Hier liegen Hilfsfunktionen für Datenabrufe
 
 // ---- Typen Gebetszeiten ----
+// ---- Typen Gebetszeiten ----
 export interface PrayerTimes {
     fajr: string;
     sunrise: string;
@@ -9,9 +10,18 @@ export interface PrayerTimes {
     asr: string;
     maghrib: string;
     isha: string;
-    // falls du auch andere Felder hast wie "imsak" etc.,
-    // diese hier ergänzen
+
+    // zusätzliche Felder aus der API
+    hijriDateLong?: string;          // "6 Cemaziyelevvel 1447"
+    hijriDateShort?: string;         // "6.5.1447"
+    gregorianDateShort?: string;     // "28.10.2025"
+    gregorianDateLong?: string;      // "28 Ekim 2025 Salı"
+    shapeMoonUrl?: string;           // Mond-Icon URL
+    qiblaTime?: string;              // "08:51"
+    astronomicalSunrise?: string;
+    astronomicalSunset?: string;
 }
+
 
 export interface PrayerTimesApiResponse {
     success: boolean;
@@ -45,6 +55,13 @@ export async function fetchPrayerTimesFromApi(prayerApiUrl: string): Promise<Pra
 
         const json = await res.json();
 
+        // Erwartetes Format:
+        // {
+        //   "success": true,
+        //   "data": [
+        //      { fajr: "...", hijriDateLong: "...", ... }
+        //   ]
+        // }
         if (json && json.success && Array.isArray(json.data) && json.data.length > 0) {
             const first = json.data[0];
 
@@ -55,6 +72,16 @@ export async function fetchPrayerTimesFromApi(prayerApiUrl: string): Promise<Pra
                 asr: first.asr,
                 maghrib: first.maghrib,
                 isha: first.isha,
+
+                // neue Felder:
+                hijriDateLong: first.hijriDateLong,
+                hijriDateShort: first.hijriDateShort,
+                gregorianDateShort: first.gregorianDateShort,
+                gregorianDateLong: first.gregorianDateLong,
+                shapeMoonUrl: first.shapeMoonUrl,
+                qiblaTime: first.qiblaTime,
+                astronomicalSunrise: first.astronomicalSunrise,
+                astronomicalSunset: first.astronomicalSunset,
             };
 
             return mapped;
@@ -67,6 +94,7 @@ export async function fetchPrayerTimesFromApi(prayerApiUrl: string): Promise<Pra
         return null;
     }
 }
+
 
 
 // TODO: Excel-Fallback implementieren (kommt gleich aus deinem alten Code)
