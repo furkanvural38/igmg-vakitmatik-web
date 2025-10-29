@@ -1,4 +1,3 @@
-// src/features/footerTicker/FooterTicker.tsx
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useCity } from "../../app/CityProvider";
 import { useVerticalScroll } from "../../hooks/useVerticalScroll";
@@ -51,11 +50,9 @@ export function FooterTicker() {
     useVerticalScroll(containerRef, contentRef);
 
     return (
-        <footer
-            className="
-                glass-card
-                glass-card-content
-                glass-animate-in
+        <div
+            className={`
+                glass-card glass-card-content glass-animate-in
                 w-full
                 flex
                 items-center
@@ -63,36 +60,34 @@ export function FooterTicker() {
                 text-white
                 mx-auto
                 rounded-3xl
-                h-[450px]
-                px-8
-            "
+                px-6
+                py-4
+                gap-6
+            `}
             style={{
                 boxShadow:
                     "0 30px 80px rgba(0,0,0,0.9), 0 10px 30px rgba(0,0,0,0.8), 0 0 60px rgba(0,150,255,0.3)",
-
             }}
         >
             {!activeItem ? (
                 <div
                     className="text-white font-light flex items-center"
                     style={{
-                        fontSize: "4rem",
+                        fontSize: "2rem",
                         lineHeight: 1.2,
-                        paddingLeft: "2rem",
+                        paddingLeft: "1rem",
                     }}
                 >
                     Lade islamische Inhalte…
                 </div>
             ) : (
                 <>
-                    {/* LINKER BLOCK: großes Bild */}
+                    {/* LINKER BLOCK: Bild / Icon */}
                     <div
                         className="flex-shrink-0 flex items-center justify-center"
                         style={{
-                            marginLeft: "0.5rem",
-                            marginRight: "2rem",
-                            height: "22rem", // groß wie gewünscht
-                            width: "22rem",
+                            width: "6rem",
+                            height: "6rem",
                         }}
                     >
                         {(() => {
@@ -115,7 +110,7 @@ export function FooterTicker() {
                                 <div
                                     className="text-[#009972] font-bold text-center"
                                     style={{
-                                        fontSize: "4rem",
+                                        fontSize: "2rem",
                                         lineHeight: 1.1,
                                     }}
                                 >
@@ -125,54 +120,41 @@ export function FooterTicker() {
                         })()}
                     </div>
 
-                    {/* RECHTER BLOCK: vertikaler scroll-bereich */}
+                    {/* RECHTER BLOCK: Textbereich mit Auto-Scroll */}
                     <div
                         ref={containerRef}
-                        className="
-                            flex-grow
-                            overflow-hidden
-                            flex
-                            justify-center
-                            items-center
-                        "
+                        className="flex-grow overflow-hidden flex items-center"
                         style={{
-                            // sichtfenster für den scroll
-                            height: "24rem",
+                            maxHeight: "8rem", // begrenze Sichtfenster
                         }}
                     >
                         <div
                             ref={contentRef}
-                            className="
-                                flex
-                                flex-col
-                                w-full
-                                text-white
-                            "
+                            className="flex flex-col w-full text-white"
                             style={{
-                                rowGap: "2rem", // abstand zwischen text und quelle
-                                // KEIN justify-center hier, damit contentRef richtige natürliche Höhe bekommt
-                                // Breite begrenzen, damit Text nicht von Rand zu Rand klatscht
+                                rowGap: "1rem",
                                 maxWidth: "100%",
                             }}
                         >
-                            {/* Haupttext (zentriert anzeigen) */}
+                            {/* Haupttext */}
                             <div
-                                className="text-white text-center mt-16"
+                                className="text-white text-center"
                                 style={{
-                                    fontSize: "6rem",
-                                    lineHeight: 1.2,
+                                    fontSize: "2rem",
+                                    lineHeight: 1.3,
+                                    wordBreak: "break-word",
                                 }}
                             >
                                 {activeItem.text}
                             </div>
 
-                            {/* Quelle / Hadith-Quelle: immer letztes Element, rechts ausgerichtet */}
+                            {/* Quelle */}
                             {activeItem.source ? (
                                 <div
                                     className="text-white self-end text-right"
                                     style={{
-                                        fontSize: "5rem",
-                                        lineHeight: 1.2,
+                                        fontSize: "1.5rem",
+                                        lineHeight: 1.3,
                                     }}
                                 >
                                     {activeItem.source}
@@ -182,6 +164,6 @@ export function FooterTicker() {
                     </div>
                 </>
             )}
-        </footer>
+        </div>
     );
 }

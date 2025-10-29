@@ -13,15 +13,9 @@ export interface WeatherCardProps {
 type Star = {
     top: string;
     left: string;
-    size: string; // in px
+    size: string; // px
 };
 
-/**
- * Dynamische WeatherCard:
- * - Hintergrundfarbe je nach Gebetszeit (fajr/sunrise/dhuhr/...)
- * - statischer Sternenhimmel bei Nacht (fajr & isha)
- * - Apple / visionOS style Glass Panel Look
- */
 export function WeatherCard({
                                 cityName,
                                 icon,
@@ -29,17 +23,12 @@ export function WeatherCard({
                                 temperatureC,
                                 currentPrayer,
                             }: WeatherCardProps): JSX.Element {
-    //
-    // 1. Hintergrundverlauf abhängig von der aktuellen Gebetszeit
-    //
+    // dynamischer Hintergrund basierend auf currentPrayer
     const backgroundStyle = useMemo(() => {
         switch (currentPrayer) {
             case "fajr":
-                // Vor Sonnenaufgang: sehr dunkles Blau
                 return "linear-gradient(to bottom, #0a1a3d 0%, #10284e 60%, #1b3a6b 100%)";
-
             case "sunrise":
-                // Sonnenaufgang: dunkler, dezenter, warm/golden von oben nach unten
                 return `
                     radial-gradient(
                         ellipse at top center,
@@ -53,36 +42,22 @@ export function WeatherCard({
                         #e5b56a 100%
                     )
                 `;
-
             case "dhuhr":
-                // Mittag: dein Standard-Design (türkis/blau/grün)
                 return "linear-gradient(to bottom right, #007CFF 0%, #00C0FF 50%, #00E5A0 100%)";
-
             case "asr":
-                // Später Nachmittag: kräftiges Blau oben → helleres unten
                 return "linear-gradient(to bottom, #0055cc 0%, #3399ff 70%, #a6d8ff 100%)";
-
             case "maghrib":
-                // Sonnenuntergang: warm → kühl (Orange nach Blau/Violett)
                 return "linear-gradient(to bottom, #ff7e5f 0%, #feb47b 40%, #355c7d 100%)";
-
             case "isha":
-                // Nacht: fast schwarz
                 return "linear-gradient(to bottom, #000010 0%, #0a0a1a 70%, #1a1a2a 100%)";
-
             default:
-                // Fallback (Mittag)
                 return "linear-gradient(to bottom right, #007CFF 0%, #00C0FF 50%, #00E5A0 100%)";
         }
     }, [currentPrayer]);
 
-    //
-    // 2. Sterne nur für "isha" (Yatsı) und "fajr" (İmsak)
-    //    useMemo => neue zufällige Stern-Positionen erst, wenn die Gebetsphase wechselt,
-    //    NICHT jede Sekunde beim Clock-Update.
-    //
+    // Sterne für Nachtphasen
     const stars: Star[] = useMemo(() => {
-        const STAR_COUNT = 60;
+        const STAR_COUNT = 40;
         const arr: Star[] = [];
         for (let i = 0; i < STAR_COUNT; i++) {
             const sizePx = (Math.random() * 2 + 1).toFixed(2); // 1px - 3px
@@ -100,20 +75,18 @@ export function WeatherCard({
     return (
         <div
             className={clsx(
-                // layout
-                "relative flex flex-col items-center justify-center",
-                "w-[34rem] h-[34rem] flex-shrink-0",
-                // glass panel look (kommt aus deiner globalen CSS, die wir definiert haben)
-                "glass-card glass-animate-in",
-                // smoother Farb/Farbwechsel bei Gebetswechsel
-                "transition-all duration-[2000ms] ease-in-out"
+                // gleiche äußere Box wie Prayer-Tile:
+                "relative flex flex-col items-center text-center",
+                "glass-card rounded-2xl px-4 py-4 flex-1",
+                "min-w-[200px] max-w-[240px]",
+                "glass-animate-in",
+                "transition-all duration-[2000ms] ease-in-out",
             )}
             style={{
-                // wir benutzen unser dynamisches Himmels-Gradient
                 background: backgroundStyle,
             }}
         >
-            {/* Stern-Layer (statisch), sitzt UNTER dem Content aber ÜBER dem Verlauf */}
+            {/* Stern-Layer (nur Nacht) */}
             {showStars && (
                 <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
                     {stars.map((star, i) => (
@@ -125,8 +98,6 @@ export function WeatherCard({
                                 height: star.size,
                                 top: star.top,
                                 left: star.left,
-                                // absolut keine Bewegung
-                                animation: "none",
                                 boxShadow: "0 0 6px rgba(255,255,255,0.6)",
                             }}
                         />
@@ -134,44 +105,39 @@ export function WeatherCard({
                 </div>
             )}
 
-            {/* Inhalt der Karte */}
-            <div className="glass-card-content flex flex-col items-center justify-center text-white text-center z-[2]">
+            {/* Inhalt */}
+            <div className="glass-card-content flex flex-col items-center justify-start text-white text-center z-[2] w-full">
                 {/* Stadtname */}
-                <div
-                    className="font-semibold leading-none"
-                    style={{
-                        fontSize: "4.5rem",
-                        lineHeight: 1.1,
-                    }}
-                >
+                <div className="font-semibold text-white leading-tight text-xl">
                     {cityName ?? "—"}
                 </div>
 
-                {/* Wetter-Icon */}
-                <div className="mt-4">
+                {/* Icon */}
+                <div className="mt-2 flex items-center justify-center">
                     {icon ? (
                         <img
                             src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
                             alt={description ?? ""}
-                            className="w-64 h-64 object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.8)]"
+                            className="w-16 h-16 object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.8)]"
                         />
                     ) : (
-                        <div className="w-64 h-64" />
+                        <div className="w-16 h-16" />
                     )}
                 </div>
 
                 {/* Temperatur */}
-                <div
-                    className="font-semibold leading-none"
-                    style={{
-                        fontSize: "7rem",
-                        lineHeight: 1.1,
-                    }}
-                >
+                <div className="font-semibold leading-none text-4xl mt-2">
                     {temperatureC !== null && temperatureC !== undefined
-                        ? Math.round(temperatureC) + "°C"
+                        ? `${Math.round(temperatureC)}°C`
                         : "—"}
                 </div>
+
+                {/* Beschreibung, klein drunter */}
+                {description ? (
+                    <div className="text-white/80 text-sm font-light mt-1 leading-snug">
+                        {description}
+                    </div>
+                ) : null}
             </div>
         </div>
     );

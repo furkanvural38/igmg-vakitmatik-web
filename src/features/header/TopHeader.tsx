@@ -5,82 +5,86 @@ export function TopHeader() {
     const { config } = useCity();
 
     return (
-        <div
+        <header
             className="
-                flex
                 w-full
+                flex
                 items-center
                 justify-between
-                m-6
-                gap-6
+                px-4
+                py-3
+                gap-4
             "
+            style={{
+                margin: 0,
+            }}
         >
-            {/* 🔸 Logo box mit Glass-Effekt */}
+            {/* LOGO-BOX (kompakt) */}
             <div
-                className={`
+                className="
                     relative
                     flex
                     items-center
                     justify-center
-                    rounded-2xl
-                    px-10
-                    py-6
+                    rounded-xl
                     glass-text
-                `}
+                    px-4
+                    py-2
+                "
                 style={{
-                    flex: "0 0 550px",
-                    height: "200px",
-                    borderRadius: "1.5rem", // = rounded-2xl fallback für inline glow layer
+                    flex: "0 0 220px",     // feste Breite: kompakt
+                    height: "64px",        // Header-Scale niedrig
+                    borderRadius: "0.75rem",
                 }}
             >
-                {/* Glow-Ring hinter der Box */}
+                {/* optionaler Glow-Ring */}
                 <div
                     style={{
-                        borderRadius: "1.5rem",
+                        borderRadius: "0.75rem",
                         position: "absolute",
-                        inset: "-8px",
-                        opacity: 0.6,
+                        inset: "-4px",
+                        opacity: 0.5,
                         zIndex: 1,
                         pointerEvents: "none",
                     }}
                 />
 
-                {/* Inhalt oben drüber */}
+                {/* Logo selbst */}
                 <div
                     className="relative z-[2] flex items-center justify-center"
                     style={{
-                        filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.9))",
+                        filter: "drop-shadow(0 6px 12px rgba(0,0,0,0.8))",
                     }}
                 >
                     <img
                         src={IGMGLogo}
                         alt="IGMG"
-                        className="h-[130px] object-contain"
+                        className="h-[48px] object-contain"
                     />
                 </div>
             </div>
 
-            {/* 🔸 Moschee-Name box mit Glass-Effekt */}
+            {/* MOSCHEE-NAME (kompakt) */}
             <div
-                className={`
+                className="
                     relative
                     flex
                     items-center
                     justify-center
-                    rounded-2xl
-                    px-12
-                    py-6
-                    uppercase
-                    text-center
-                    leading-snug
                     flex-1
-                  
+                    rounded-xl
                     glass-text
-                `}
+                    text-center
+                    uppercase
+                    leading-snug
+                    px-6
+                    py-2
+                    min-w-0
+                "
                 style={{
-                    height: "200px",
-                    borderRadius: "1.5rem",
-                    fontSize: "7rem",
+                    height: "64px",
+                    borderRadius: "0.75rem",
+                    fontSize: "2rem",           // ~32px statt 5.5rem
                     fontWeight: 700,
                     letterSpacing: ".08em",
                     color: "white",
@@ -88,31 +92,32 @@ export function TopHeader() {
                         "0 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(0,0,0,0.8)",
                 }}
             >
-                {/* Glow-Ring hinter der Box */}
+                {/* Glow-Ring */}
                 <div
                     style={{
-                        borderRadius: "1.5rem",
+                        borderRadius: "0.75rem",
                         position: "absolute",
-                        inset: "-8px",
-                        opacity: 0.6,
+                        inset: "-4px",
+                        opacity: 0.5,
                         zIndex: 1,
                         pointerEvents: "none",
                     }}
                 />
 
-                {/* Text oben drüber */}
+                {/* Text */}
                 <div
-                    className="relative z-[2] text-white font-bold tracking-[.08em]"
+                    className="relative z-[2] text-white font-bold tracking-[.08em] truncate"
                     style={{
                         lineHeight: "1.1",
-                        textAlign: "center",
                         width: "100%",
-                        filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.9))",
+                        filter: "drop-shadow(0 6px 12px rgba(0,0,0,0.8))",
+                        fontSize: "2rem", // redundant, aber explizit
                     }}
+                    title={config?.mosqueName ?? "—"}
                 >
                     {config?.mosqueName ?? "—"}
                 </div>
             </div>
-        </div>
+        </header>
     );
 }
