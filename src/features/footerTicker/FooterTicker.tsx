@@ -53,6 +53,9 @@ export function FooterTicker() {
     return (
         <footer
             className="
+                glass-card
+                glass-card-content
+                glass-animate-in
                 w-full
                 flex
                 items-center
@@ -64,9 +67,9 @@ export function FooterTicker() {
                 px-8
             "
             style={{
-                backgroundColor: "#343434",
-                border: "1px solid rgba(255,255,255,0.15)",
-                boxShadow: "0 20px 60px rgba(0,0,0,0.8)",
+                boxShadow:
+                    "0 30px 80px rgba(0,0,0,0.9), 0 10px 30px rgba(0,0,0,0.8), 0 0 60px rgba(0,150,255,0.3)",
+
             }}
         >
             {!activeItem ? (
