@@ -77,21 +77,21 @@ export function PrayerPanel(): JSX.Element {
     //
     function tileClasses(isActive: boolean): string {
         const base = [
-            "relative flex flex-col items-center", // <-- justify-center raus!
+            "relative flex flex-col items-center",
             "w-[34rem] h-[34rem]",
             "mt-30",
             "glass-card",
         ];
 
-        if (isActive) base.push("glass-animate-in");
+        if (isActive) {
+            base.push("glass-animate-in");
+        }
+
         return base.join(" ");
     }
 
-
     function tileInnerStyles(isActive: boolean): React.CSSProperties {
         if (isActive) {
-            // neues radial glow behalten,
-            // aber Farbquelle vom alten Code (activeBgColor)
             return {
                 background:
                     activeBgColor === DANGER
@@ -120,10 +120,8 @@ export function PrayerPanel(): JSX.Element {
                             mb-6
                         "
                         style={{
-                            // alte Typo-Sizes
                             fontSize: "6rem",
                             lineHeight: 1.1,
-                            // alter Grünton-Rahmen als Akzent, statt hartem bg
                             backgroundColor: `${GREEN}40`,
                         }}
                     >
@@ -154,7 +152,7 @@ export function PrayerPanel(): JSX.Element {
                 </div>
 
                 {/* Uhrzeit in der Mitte */}
-                <div className="flex  flex-row font-bebas text-clock items-end justify-center text-white leading-none font-extrabold tracking-tight text-center">
+                <div className="flex flex-row font-bebas text-clock items-end justify-center text-white leading-none font-extrabold tracking-tight text-center">
                     <div className="text-clock leading-[0.8]">
                         {timeParts.hh}:{timeParts.mm}
                     </div>
@@ -203,9 +201,25 @@ export function PrayerPanel(): JSX.Element {
                                 className={tileClasses(isActive)}
                                 style={tileInnerStyles(isActive)}
                             >
-                                {/* Countdown + Fortschritt (alte Position/-top/-translate Sizing behalten) */}
+                                {/* Ring-Overlay (nimmt keinen Layout-Platz weg) */}
                                 {isActive && (
-                                    <div className="glass-active-ring">
+                                    <div
+                                        className={
+                                            progressPercentage > 90
+                                                ? "glass-deactive-ring"
+                                                : "glass-active-ring"
+                                        }
+                                        style={{
+                                            position: "absolute",
+                                            inset: 0,
+                                            pointerEvents: "none",
+                                            borderRadius: "inherit",
+                                        }}
+                                    />
+                                )}
+
+                                {/* Countdown + Fortschritt */}
+                                {isActive && (
                                     <div className="absolute -top-46 left-1/2 -translate-x-1/2 w-full px-4 text-white z-[5]">
                                         <div className="text-center text-white mb-4 text-8xl">
                                             {diffLabelShort}
@@ -229,11 +243,10 @@ export function PrayerPanel(): JSX.Element {
                                             />
                                         </div>
                                     </div>
-                                    </div>
                                 )}
 
                                 {/* Inhalt der Kachel */}
-                                <div className="flex flex-col items-center justify-start text-center z-[4] pt-8">
+                                <div className="flex flex-col items-center justify-start text-center z-[4] pt-8 relative">
                                     {/* Icon */}
                                     <div
                                         className={`${
@@ -270,7 +283,9 @@ export function PrayerPanel(): JSX.Element {
                                     {/* Uhrzeit */}
                                     <span
                                         className={`${
-                                            isActive ? "text-white" : "text-[#a7a7a7]"
+                                            isActive
+                                                ? "text-white"
+                                                : "text-[#a7a7a7]"
                                         } font-semibold mt-4 text-[7rem] leading-none`}
                                     >
                                         {timeVal}

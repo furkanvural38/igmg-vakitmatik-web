@@ -246,7 +246,20 @@ body {
     border-radius: inherit;
     background: radial-gradient(
             circle at 50% 50%,
-            rgba(0,255,180,0.4) 0%,
+            rgba(0, 222, 114,0.4) 20%,
+            rgba(0,0,0,0) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+.glass-deactive-ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+    background: radial-gradient(
+            circle at 50% 50%,
+            rgba(255, 59, 48,1) 20%,
             rgba(0,0,0,0) 100%
     );
     pointer-events: none;
